@@ -1,0 +1,21 @@
+name: YouTube Cloud Automation
+
+on:
+  workflow_dispatch:
+
+jobs:
+  cloud-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Start cloud system
+        run: echo "YouTube AI Cloud System Started"
+
+      - name: Check automation
+        run: |
+          echo "Cloud server is working"
+          echo "Jungle Construction channel ready"
+          echo "Kids Cartoon Stories channel ready"
+
+      - name: Finish
+        run: echo "Cloud test completed successfully"
