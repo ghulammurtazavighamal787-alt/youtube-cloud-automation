@@ -1,48 +1,63 @@
 import os
 import json
 import urllib.request
+import urllib.error
 
-api_key = os.environ["GEMINI_API_KEY"]
+api_key = os.environ.get("GEMINI_API_KEY")
+
+if not api_key:
+    raise RuntimeError("GEMINI_API_KEY secret is missing!")
 
 prompt = """
-Create an original YouTube Shorts script for a realistic AI jungle
-construction video.
+Create an original English YouTube Shorts script.
 
+Channel: Jungle Construction
 Topic: Building a luxury underground swimming pool in a jungle.
 
-Write:
+Include:
 1. Catchy title
-2. 45-second video script
-3. Scene-by-scene visual prompts
-4. YouTube description
-5. Relevant hashtags
+2. 45-second narration
+3. 8 detailed video scenes
+4. Visual prompts for each scene
+5. YouTube description
+6. Relevant hashtags
 
-Make it engaging and realistic.
+Make the story realistic, engaging and cinematic.
 """
 
 url = (
     "https://generativelanguage.googleapis.com/v1beta/"
-    "models/gemini-2.5-flash:generateContent"
-    f"?key={api_key}"
+    "models/gemini-3.8-flash:generateContent"
 )
 
 data = {
-    "contents": [{"parts": [{"text": prompt}]}]
+    "contents": [
+        {"parts": [{"text": prompt}]}
+    ]
 }
 
 request = urllib.request.Request(
     url,
     data=json.dumps(data).encode("utf-8"),
-    headers={"Content-Type": "application/json"},
+    headers={
+        "Content-Type": "application/json",
+        "x-goog-api-key": api_key
+    },
     method="POST"
 )
 
-with urllib.request.urlopen(request) as response:
-    result = json.loads(response.read().decode("utf-8"))
+try:
+    with urllib.request.urlopen(request, timeout=120) as response:
+        result = json.loads(response.read().decode("utf-8"))
 
-text = result["candidates"][0]["content"]["parts"][0]["text"]
+    generated_text = result["candidates"][0]["content"]["parts"][0]["text"]
 
-with open("generated_script.txt", "w", encoding="utf-8") as file:
-    file.write(text)
+    with open("generated_script.txt", "w", encoding="utf-8") as file:
+        file.write(generated_text)
 
-print("Gemini script generated successfully!")
+    print("SUCCESS: Gemini generated your YouTube script!")
+
+except urllib.error.HTTPError as error:
+    print("Gemini API error:", error.code)
+    print(error.read().decode("utf-8"))
+    raise
