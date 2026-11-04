@@ -1,6 +1,7 @@
- 
+
 import os
 import json
+import time
 import urllib.request
 import urllib.error
 
@@ -32,41 +33,52 @@ url = (
 )
 
 data = {
-    "contents": [
-        {
-            "parts": [
-                {"text": prompt}
-            ]
-        }
-    ]
+    "contents": [{"parts": [{"text": prompt}]}]
 }
 
-request = urllib.request.Request(
-    url,
-    data=json.dumps(data).encode("utf-8"),
-    headers={
-        "Content-Type": "application/json",
-        "x-goog-api-key": api_key
-    },
-    method="POST"
-)
+request_data = json.dumps(data).encode("utf-8")
 
-try:
-    with urllib.request.urlopen(request, timeout=120) as response:
-        result = json.loads(response.read().decode("utf-8"))
+for attempt in range(1, 5):
+    request = urllib.request.Request(
+        url,
+        data=request_data,
+        headers={
+            "Content-Type": "application/json",
+            "x-goog-api-key": api_key
+        },
+        method="POST"
+    )
 
-    generated_text = result["candidates"][0]["content"]["parts"][0]["text"]
+    try:
+        print(f"Gemini request attempt {attempt}/4")
 
-    with open("generated_script.txt", "w", encoding="utf-8") as file:
-        file.write(generated_text)
+        with urllib.request.urlopen(request, timeout=120) as response:
+            result = json.loads(response.read().decode("utf-8"))
 
-    print("SUCCESS: Gemini generated your YouTube script!")
+        generated_text = (
+            result["candidates"][0]["content"]["parts"][0]["text"]
+        )
 
-except urllib.error.HTTPError as error:
-    print("Gemini API Error:", error.code)
-    print(error.read().decode("utf-8"))
-    raise
+        with open("generated_script.txt", "w", encoding="utf-8") as file:
+            file.write(generated_text)
 
-except Exception as error:
-    print("Error:", str(error))
-    raise
+        print("SUCCESS: Gemini script generated!")
+        break
+
+    except urllib.error.HTTPError as error:
+        details = error.read().decode("utf-8")
+        print(f"API error {error.code}: {details}")
+
+        if error.code not in (429, 500, 502, 503, 504):
+            raise
+
+        if attempt == 4:
+            raise RuntimeError("Gemini is still unavailable after 4 attempts.")
+
+        wait_time = attempt * 15
+        print(f"Retrying after {wait_time} seconds...")
+        time.sleep(wait_time)
+
+    except Exception as error:
+        print("Unexpected error:", error)
+        raise
