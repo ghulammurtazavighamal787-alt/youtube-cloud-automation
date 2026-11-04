@@ -1,3 +1,4 @@
+ 
 import os
 import json
 import urllib.request
@@ -22,7 +23,7 @@ Include:
 5. YouTube description
 6. Relevant hashtags
 
-Make the story realistic, engaging and cinematic.
+Make it realistic, engaging and cinematic.
 """
 
 url = (
@@ -32,7 +33,11 @@ url = (
 
 data = {
     "contents": [
-        {"parts": [{"text": prompt}]}
+        {
+            "parts": [
+                {"text": prompt}
+            ]
+        }
     ]
 }
 
@@ -58,6 +63,10 @@ try:
     print("SUCCESS: Gemini generated your YouTube script!")
 
 except urllib.error.HTTPError as error:
-    print("Gemini API error:", error.code)
+    print("Gemini API Error:", error.code)
     print(error.read().decode("utf-8"))
+    raise
+
+except Exception as error:
+    print("Error:", str(error))
     raise
