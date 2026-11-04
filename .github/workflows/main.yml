@@ -8,14 +8,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Start cloud system
-        run: echo "YouTube AI Cloud System Started"
+      - name: Download repository
+        uses: actions/checkout@v4
 
-      - name: Check automation
-        run: |
-          echo "Cloud server is working"
-          echo "Jungle Construction channel ready"
-          echo "Kids Cartoon Stories channel ready"
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
-      - name: Finish
-        run: echo "Cloud test completed successfully"
+      - name: Generate AI Script
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python generate_script.py
+
+      - name: Save generated script
+        uses: actions/upload-artifact@v4
+        with:
+          name: Jungle-Video-Script
+          path: generated_script.txt
