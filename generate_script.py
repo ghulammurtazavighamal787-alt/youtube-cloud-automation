@@ -13,49 +13,63 @@ BASE = "https://generativelanguage.googleapis.com/v1beta"
 HEADERS = {"Content-Type": "application/json", "x-goog-api-key": API_KEY}
 
 PROMPT = """
-You are a professional YouTube video scriptwriter.
+You are a professional YouTube video production planner.
 
 CHANNEL: Realistic AI Jungle Construction
 LANGUAGE: English
-VIDEO TYPE: Cinematic construction timelapse
+TOPIC: Building a Luxury Underground Swimming Pool in a Dense Jungle.
 
-VIDEO TOPIC:
-Building a Luxury Underground Swimming Pool in a Dense Jungle.
+VIDEO DURATION: EXACTLY 60 SECONDS.
 
-Create a complete 5-minute YouTube video plan.
+Create a complete production plan for ONE 60-second video.
 
-Include:
+STRICT REQUIREMENTS:
 
 1. Catchy YouTube title.
-2. Powerful 15-second opening hook.
-3. Complete 5-minute narration.
-4. 30 chronological video scenes.
-5. Detailed realistic AI video prompt for every scene.
-6. Camera angles and camera movements.
-7. Construction stages:
-   - Jungle location preparation
-   - Clearing the construction area
-   - Excavation
-   - Foundation and reinforcement
-   - Underground pool construction
-   - Waterproofing
-   - Water filling
-   - Luxury finishing
-   - Final cinematic reveal
+2. Opening hook: maximum 3 seconds.
+3. Narration: approximately 100-120 words.
+4. EXACTLY 8 chronological scenes.
+5. Each scene: approximately 7-8 seconds.
+6. Detailed AI video generation prompt for every scene.
+7. Camera angle and camera movement for every scene.
 8. Background music and sound effects.
 9. YouTube description and hashtags.
 
-IMPORTANT RULES:
-- Show actual construction, not a nature documentary.
-- Keep the same jungle location and pool design throughout.
-- Every scene must logically continue from the previous scene.
-- Use realistic workers, tools, machinery and materials.
-- Do not include unrelated animals or wildlife scenes.
+CONSTRUCTION STORY:
+- Scene 1: Show the jungle construction location.
+- Scene 2: Clear the jungle area.
+- Scene 3: Mark the pool and excavate the ground.
+- Scene 4: Prepare the foundation and reinforcement.
+- Scene 5: Build the underground pool structure.
+- Scene 6: Apply waterproofing and install tiles.
+- Scene 7: Fill the pool with clean water and finish the deck.
+- Scene 8: Reveal the completed luxury underground pool.
+
+CREATE TWO FORMATS:
+A. YouTube Shorts: Vertical 9:16.
+B. Regular YouTube video: Horizontal 16:9.
+
+Both formats must use the SAME 60-second story and 8 scenes.
+Adapt the camera framing for each format.
+
+CONTINUITY RULES:
+- Keep the same jungle location throughout.
+- Keep workers, clothing and pool design consistent.
+- Show realistic construction progress.
+- Every scene must continue from the previous scene.
 - Use photorealistic cinematic visuals.
-- Make the final result visually impressive.
+- No unrelated wildlife or documentary footage.
+
+FINAL VALIDATION:
+- Total duration must be exactly 60 seconds.
+- Exactly 8 scenes.
+- No 5-minute narration.
+- No 30-scene production plan.
+- Do not add extra scenes.
+- If requirements conflict, ALWAYS follow the 60-second limit.
+
+Return the complete production plan in clearly labeled sections.
 """
-
-
 def get(url):
     req = urllib.request.Request(url, headers=HEADERS)
     with urllib.request.urlopen(req, timeout=60) as r:
