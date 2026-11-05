@@ -12,9 +12,48 @@ if not API_KEY:
 BASE = "https://generativelanguage.googleapis.com/v1beta"
 HEADERS = {"Content-Type": "application/json", "x-goog-api-key": API_KEY}
 
-PROMPT = """Write a 5-minute cinematic documentary YouTube script about a jungle.
-Use a strong cold-open hook, short spoken sentences, a midpoint twist,
-and an ending line that ties it to today. Add [visual cue] notes."""
+PROMPT = """
+You are a professional YouTube video scriptwriter.
+
+CHANNEL: Realistic AI Jungle Construction
+LANGUAGE: English
+VIDEO TYPE: Cinematic construction timelapse
+
+VIDEO TOPIC:
+Building a Luxury Underground Swimming Pool in a Dense Jungle.
+
+Create a complete 5-minute YouTube video plan.
+
+Include:
+
+1. Catchy YouTube title.
+2. Powerful 15-second opening hook.
+3. Complete 5-minute narration.
+4. 30 chronological video scenes.
+5. Detailed realistic AI video prompt for every scene.
+6. Camera angles and camera movements.
+7. Construction stages:
+   - Jungle location preparation
+   - Clearing the construction area
+   - Excavation
+   - Foundation and reinforcement
+   - Underground pool construction
+   - Waterproofing
+   - Water filling
+   - Luxury finishing
+   - Final cinematic reveal
+8. Background music and sound effects.
+9. YouTube description and hashtags.
+
+IMPORTANT RULES:
+- Show actual construction, not a nature documentary.
+- Keep the same jungle location and pool design throughout.
+- Every scene must logically continue from the previous scene.
+- Use realistic workers, tools, machinery and materials.
+- Do not include unrelated animals or wildlife scenes.
+- Use photorealistic cinematic visuals.
+- Make the final result visually impressive.
+"""
 
 
 def get(url):
