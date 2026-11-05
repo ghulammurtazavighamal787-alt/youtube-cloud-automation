@@ -1,56 +1,102 @@
+
 import os
 import json
+import time
 import urllib.request
 import urllib.error
-import time
 
 API_KEY = os.environ.get("GEMINI_API_KEY")
-# Yahan model ka naam gemini-3.8-flash set kar diya hai
-MODEL_NAME = "gemini-3.8-flash"
-URL = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL_NAME}:generateContent?key={API_KEY}"
 
-prompt_data = {
-    "contents": [{
-        "parts": [{"text": "Aapka jo bhi prompt ya script generate karne ka code hai wo yahan aayega"}]
-    }]
-}
+if not API_KEY:
+    raise RuntimeError("GEMINI_API_KEY secret is missing!")
 
-headers = {'Content-Type': 'application/json'}
-req_data = json.dumps(prompt_data).encode('utf-8')
+MODELS = [
+    "gemini-3.8-flash",
+    "gemini-3.5-flash-lite"
+]
 
-request = urllib.request.Request(URL, data=req_data, headers=headers, method='POST')
+PROMPT = """
+Create an original English YouTube Shorts script.
 
-max_attempts = 4
-backoff_delays = [15, 30, 45]
+Channel: Jungle Construction
+Topic: Building a luxury underground swimming pool in a jungle.
 
-success = False
-response_text = ""
+Include:
+1. Catchy YouTube title
+2. 45-second narration
+3. 8 detailed video scenes
+4. Realistic visual prompts for every scene
+5. YouTube description
+6. Relevant hashtags
 
-for attempt in range(1, max_attempts + 1):
-    try:
-        print(f"Gemini request attempt {attempt}/{max_attempts}")
-        with urllib.request.urlopen(request, timeout=120) as response:
-            result = json.loads(response.read().decode('utf-8'))
-            response_text = result['candidates'][0]['content']['parts'][0]['text']
-            success = True
-            break
-    except urllib.error.HTTPError as e:
-        error_body = e.read().decode('utf-8')
-        print(f"API error {e.code}: {error_body}")
-        if attempt < max_attempts:
-            delay = backoff_delays[attempt - 1]
-            print(f"Retrying after {delay} seconds...")
-            time.sleep(delay)
-    except Exception as e:
-        print(f"Unexpected error: {e}")
-        if attempt < max_attempts:
-            time.sleep(15)
+Make it cinematic, engaging and realistic.
+Each scene should connect naturally to the next.
+"""
 
-if not success:
-    raise RuntimeError(f"Gemini ({MODEL_NAME}) is still unavailable after {max_attempts} attempts.")
+def generate_script(model):
+    url = (
+        "https://generativelanguage.googleapis.com/v1beta/"
+        f"models/{model}:generateContent"
+    )
 
-# Output ko file ya aage process karne ke liye
-print("Successfully generated script!")
+    data = {
+        "contents": [
+            {"parts": [{"text": PROMPT}]}
+        ]
+    }
+
+    for attempt in range(1, 4):
+        request = urllib.request.Request(
+            url,
+            data=json.dumps(data).encode("utf-8"),
+            headers={
+                "Content-Type": "application/json",
+                "x-goog-api-key": API_KEY
+            },
+            method="POST"
+        )
+
+        try:
+            print(f"{model}: attempt {attempt}/3")
+
+            with urllib.request.urlopen(request, timeout=120) as response:
+                result = json.loads(response.read().decode("utf-8"))
+
+            return result["candidates"][0]["content"]["parts"][0]["text"]
+
+        except urllib.error.HTTPError as error:
+            details = error.read().decode("utf-8")
+            print(f"API error {error.code}: {details}")
+
+            if error.code not in (429, 500, 502, 503, 504):
+                raise
+
+            if attempt < 3:
+                delay = 15 * (2 ** (attempt - 1))
+                print(f"Waiting {delay} seconds before retry...")
+                time.sleep(delay)
+
+    return None
+
+
+generated_text = None
+
+for model in MODELS:
+    print(f"\nTrying model: {model}")
+
+    generated_text = generate_script(model)
+
+    if generated_text:
+        print(f"SUCCESS: Generated using {model}")
+        break
+
+if not generated_text:
+    raise RuntimeError("Both Gemini models failed. Please try again later.")
+
+with open("generated_script.txt", "w", encoding="utf-8") as file:
+    file.write(generated_text)
+
+print("YouTube script saved successfully!")
 
 
 
