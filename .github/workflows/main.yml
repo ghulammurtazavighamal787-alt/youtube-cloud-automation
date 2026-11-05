@@ -26,3 +26,4 @@ jobs:
         with:
           name: Jungle-Video-Script
           path: generated_script.txt
+          if-no-files-found: error
